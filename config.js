@@ -13,7 +13,7 @@
  */
 
 window.ROADMAP_CLEANER_CONFIG = {
-  GEMINI_API_KEY: "AQ.Ab8RN6IOrIdor32OVnblZ17ArUCNg1XLdnwbeJljurZpbM6Q-w",
+  GEMINI_API_KEY: "AQ.Ab8RN6LE2lNJssVq-EmHkUcP3_cbNol3t513orZxE-QHE6cQ5g",
 
   GEMINI_MODEL:    "gemini-3.6-flash",
   GEMINI_API_BASE: "https://generativelanguage.googleapis.com/v1beta",
