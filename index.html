@@ -1,0 +1,207 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roadmap Cleaner</title>
+  <script>
+    // Apply stored theme before paint to avoid a flash of the wrong theme.
+    (function () {
+      try {
+        var stored = localStorage.getItem("roadmap-cleaner-theme");
+        if (stored === "light" || stored === "dark") {
+          document.documentElement.setAttribute("data-theme", stored);
+        } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        } else {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
+      } catch (_) {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── Ambient gradient backdrop ─────────────────────────────── -->
+  <div class="bg-aurora" aria-hidden="true">
+    <span class="aurora-blob aurora-blob-1"></span>
+    <span class="aurora-blob aurora-blob-2"></span>
+    <span class="aurora-blob aurora-blob-3"></span>
+  </div>
+
+  <!-- ─── Header ────────────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h10M4 18h14" />
+            <circle cx="19" cy="12" r="2" fill="currentColor" stroke="none" />
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Roadmap Cleaner</h1>
+          <p class="subtitle">Turn any markdown roadmap into a clean, quizzable JSON tree.</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span class="pill-badge" title="Runs entirely in your browser">
+          <span class="pill-dot"></span>
+          Client-side
+        </span>
+
+        <div class="theme-switch" role="group" aria-label="Theme">
+          <button id="theme-light" class="theme-opt" type="button" aria-label="Light theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+            </svg>
+          </button>
+          <button id="theme-dark" class="theme-opt" type="button" aria-label="Dark theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Main ──────────────────────────────────────────────────── -->
+  <main class="app-main">
+
+    <!-- ─── Upload panel ────────────────────────────────────────── -->
+    <section class="panel" id="upload-panel">
+      <div class="panel-head">
+        <div class="step-badge">1</div>
+        <div class="panel-head-text">
+          <h2>Upload roadmap</h2>
+          <p>Drop a markdown file to begin.</p>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload roadmap markdown file">
+          <div class="dropzone-inner">
+            <div class="dropzone-icon-wrap">
+              <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 16V4m0 0L8 8m4-4l4 4" />
+                <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+              </svg>
+            </div>
+            <p class="dropzone-title">Drop your <code>.md</code> file here</p>
+            <p class="dropzone-sub">or <span class="link-look">browse files</span></p>
+            <input type="file" id="file-input" accept=".md,.markdown,.txt" hidden />
+          </div>
+        </div>
+
+        <div class="file-meta" id="file-meta" hidden>
+          <div class="file-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <path d="M14 2v6h6" />
+            </svg>
+          </div>
+          <span class="file-name" id="file-name">—</span>
+          <span class="file-size" id="file-size">—</span>
+          <button id="file-clear" class="btn btn-ghost btn-small">Remove</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Run panel ───────────────────────────────────────────── -->
+    <section class="panel" id="run-panel">
+      <div class="panel-head">
+        <div class="step-badge">2</div>
+        <div class="panel-head-text">
+          <h2>Clean with AI</h2>
+          <p>Send the roadmap to Gemini and receive a structured tree.</p>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="run-row">
+          <button id="run-btn" class="btn btn-primary btn-lg" disabled>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+            <span>Clean roadmap</span>
+          </button>
+
+          <label class="switch">
+            <input type="checkbox" id="debug-toggle" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-label">Show raw output</span>
+          </label>
+        </div>
+
+        <div class="status-row" id="status-row" hidden>
+          <span class="spinner" id="spinner"></span>
+          <span class="status-text" id="status-text">Idle</span>
+        </div>
+
+        <div class="alert alert-error" id="error-box" hidden></div>
+      </div>
+    </section>
+
+    <!-- ─── Result panel ────────────────────────────────────────── -->
+    <section class="panel" id="result-panel" hidden>
+      <div class="panel-head">
+        <div class="step-badge">3</div>
+        <div class="panel-head-text">
+          <h2>Cleaned roadmap</h2>
+          <p>Preview the tree, then download the JSON.</p>
+        </div>
+        <div class="result-actions">
+          <span class="badge" id="validation-badge">—</span>
+          <button id="download-btn" class="btn btn-primary btn-small">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12m0 0l-4-4m4 4l4-4" />
+              <path d="M5 21h14" />
+            </svg>
+            <span>Download</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-body">
+
+        <div class="debug-block" id="debug-block" hidden>
+          <div class="block-head">
+            <span>Raw model output</span>
+            <button id="debug-copy" class="btn btn-ghost btn-small">Copy</button>
+          </div>
+          <pre class="debug-pre" id="debug-pre"></pre>
+        </div>
+
+        <div class="tree-block">
+          <div class="block-head">
+            <span>Preview</span>
+            <div class="block-actions">
+              <button id="tree-expand"   class="btn btn-ghost btn-small">Expand all</button>
+              <button id="tree-collapse" class="btn btn-ghost btn-small">Collapse all</button>
+            </div>
+          </div>
+          <div class="tree" id="tree"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── Footer ────────────────────────────────────────────────── -->
+  <footer class="app-footer">
+    <div class="app-footer-inner">
+      <span class="footer-dot"></span>
+      <span>Runs entirely in your browser · no data leaves your machine except the Gemini API call.</span>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
